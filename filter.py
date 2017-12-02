@@ -7,15 +7,19 @@ import glob
 import json
 
 def build_new_twitter_object (twitter_object):
+    user_data = twitter_object.get('user')
     return {
-        'local_timestamp_ms': str (int (twitter_object.get('timestamp_ms')) + int(twitter_object.get('user').get('utc_offset'))),
-        'id': twitter_object.get('user').get('id'),
+        'local_timestamp_ms': str (int (twitter_object.get('timestamp_ms')) + (int(user_data.get('utc_offset'))*1000) ),
+        'id': user_data.get('id'),
         'text': twitter_object.get('text'),
-        'followers_count': twitter_object.get('user').get('followers_count'),
-        'friends_count': twitter_object.get('user').get('friends_count'),
+        'followers_count': user_data.get('followers_count'),
+        'friends_count': user_data.get('friends_count'),
         'country': 'undefined' if twitter_object.get('place') is None else twitter_object.get('place').get('country'),
-        'verified': twitter_object.get('user').get('verified'),
-        'source': twitter_object.get('source')
+        'verified': user_data.get('verified'),
+        'source': twitter_object.get('source'),
+        'original_timestamp_ms': str (int (twitter_object.get('timestamp_ms'))),
+        'utc_offset_s': user_data.get('utc_offset'),
+        'time_zone': user_data.get('time_zone')
     }
 
 if __name__ == "__main__":
@@ -61,6 +65,7 @@ if __name__ == "__main__":
                         # Build simple twitter obejct only contains info we need
                         new_twitter_object = build_new_twitter_object(twitter_object)
 
+                        #print(json.dumps(twitter_object, indent=4, sort_keys=False))
                         #print(json.dumps(new_twitter_object, indent=4, sort_keys=False))
                         data_filtered.append(new_twitter_object)
         f.close()
